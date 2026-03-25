@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MA | سيرفر رول بلاي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===================== VARIABLES ===================== */
+:root {
+  --gold: #d4a017;
+  --gold2: #f0c040;
+  --gold3: #a07010;
+  --dark: #080810;
+  --dark2: #0d0d1a;
+  --dark3: #111120;
+  --dark4: #161628;
+  --card: rgba(16,16,28,0.95);
+  --border: rgba(212,160,23,0.18);
+  --border2: rgba(212,160,23,0.35);
+  --text: #ede8da;
+  --text2: #b0a890;
+  --text3: #706850;
+  --red: #e53e3e;
+  --green: #38a169;
+}
+
+/* ===================== RESET ===================== */
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:var(--dark);
+  color:var(--text);
+  direction:rtl;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+
+/* ===================== SCROLLBAR ===================== */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--dark2);}
+::-webkit-scrollbar-thumb{background:var(--gold3);border-radius:3px;}
+
+/* ===================== NAVBAR ===================== */
+#navbar{
+  position:fixed;top:0;left:0;right:0;z-index:9999;
+  height:68px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 3rem;
+  background:rgba(8,8,16,0.9);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  transition:background 0.3s;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:0.8rem;
+  text-decoration:none;
+  cursor:pointer;
+}
+.nav-logo-hex{
+  width:44px;height:44px;
+  background:linear-gradient(135deg,var(--gold),var(--gold3));
+  clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cairo',sans-serif;
+  font-weight:900;font-size:1rem;color:#000;
+  transition:transform 0.4s;
+  flex-shrink:0;
+}
+.nav-logo:hover .nav-logo-hex{transform:rotate(30deg);}
+.nav-logo-text{
+  font-family:'Cairo',sans-serif;
+  font-weight:900;font-size:1.2rem;
+  color:var(--gold);
+  letter-spacing:1px;
+}
+.nav-links{
+  display:flex;gap:0;list-style:none;
+}
+.nav-links li a{
+  display:block;
+  padding:0.5rem 1.4rem;
+  color:var(--text2);
+  text-decoration:none;
+  font-size:0.95rem;font-weight:600;
+  transition:color 0.3s;
+  position:relative;
+  cursor:pointer;
+}
+.nav-links li a::after{
+  content:'';
+  position:absolute;bottom:-1px;left:1.4rem;right:1.4rem;
+  height:2px;background:var(--gold);
+  transform:scaleX(0);transition:transform 0.3s;
+}
+.nav-links li a:hover,.nav-links li a.active{color:var(--gold);}
+.nav-links li a:hover::after,.nav-links li a.active::after{transform:scaleX(1);}
+
+.nav-user{
+  display:flex;align-items:center;gap:0.8rem;
+}
+.nav-avatar{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid var(--gold);
+  object-fit:cover;
+}
+.nav-username{
+  font-size:0.9rem;font-weight:700;
+  color:var(--gold);
+}
+.btn-logout{
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--text3);
+  font-family:'Tajawal',sans-serif;
+  font-size:0.8rem;
+  padding:0.3rem 0.8rem;
+  border-radius:6px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-logout:hover{border-color:var(--red);color:var(--red);}
+
+/* ===================== PAGES ===================== */
+.page{display:none;padding-top:68px;}
+.page.active{display:block;}
+
+/* ===================== HOME HERO ===================== */
+#hero{
+  position:relative;
+  height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:url('https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=1920&q=80') center/cover no-repeat;
+  filter:brightness(0.25) saturate(0.5);
+  transform:scale(1.05);
+  animation:slowZoom 20s ease infinite alternate;
+}
+@keyframes slowZoom{from{transform:scale(1.05);}to{transform:scale(1.15);}}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,
+    rgba(8,8,16,0.3) 0%,
+    transparent 30%,
+    transparent 60%,
+    rgba(8,8,16,0.8) 85%,
+    var(--dark) 100%
+  );
+}
+.hero-particles{
+  position:absolute;inset:0;
+  overflow:hidden;
+  pointer-events:none;
+}
+.particle{
+  position:absolute;
+  width:2px;height:2px;
+  background:var(--gold);
+  border-radius:50%;
+  opacity:0;
+  animation:float var(--dur,8s) var(--delay,0s) infinite;
+}
+@keyframes float{
+  0%{opacity:0;transform:translateY(100vh) translateX(0);}
+  10%{opacity:0.6;}
+  90%{opacity:0.3;}
+  100%{opacity:0;transform:translateY(-20px) translateX(var(--drift,20px));}
+}
+.hero-content{
+  position:relative;z-index:2;
+  max-width:900px;padding:0 2rem;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:0.7rem;
+  border:1px solid var(--border2);
+  background:rgba(212,160,23,0.08);
+  color:var(--gold);
+  padding:0.4rem 1.4rem;
+  border-radius:50px;
+  font-size:0.82rem;font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:2rem;
+  animation:fadeUp 1s 0.1s both;
+}
+.hero-eyebrow::before{content:'⬡';font-size:0.7rem;}
+.hero-title{
+  font-family:'Cairo',sans-serif;
+  font-size:clamp(3rem,7vw,6.5rem);
+  font-weight:900;
+  line-height:1.05;
+  margin-bottom:1.5rem;
+  animation:fadeUp 1s 0.2s both;
+}
+.hero-title .gold{
+  color:var(--gold);
+  text-shadow:0 0 60px rgba(212,160,23,0.4);
+}
+.hero-title .stroke{
+  -webkit-text-stroke:2px var(--gold);
+  color:transparent;
+}
+.hero-desc{
+  font-size:1.1rem;
+  color:var(--text2);
+  line-height:2;
+  max-width:650px;
+  margin:0 auto 2.5rem;
+  animation:fadeUp 1s 0.3s both;
+}
+.hero-btns{
+  display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp 1s 0.4s both;
+}
+.btn-gold{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  background:linear-gradient(135deg,var(--gold),var(--gold3));
+  color:#000;
+  font-family:'Cairo',sans-serif;
+  font-size:1rem;font-weight:700;
+  padding:0.9rem 2.2rem;
+  border:none;border-radius:8px;
+  cursor:pointer;text-decoration:none;
+  transition:transform 0.2s,box-shadow 0.2s;
+  white-space:nowrap;
+}
+.btn-gold:hover{
+  transform:translateY(-3px);
+  box-shadow:0 15px 40px rgba(212,160,23,0.4);
+}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  background:transparent;
+  color:var(--gold);
+  font-family:'Cairo',sans-serif;
+  font-size:1rem;font-weight:700;
+  padding:0.9rem 2.2rem;
+  border:1px solid var(--border2);
+  border-radius:8px;
+  cursor:pointer;text-decoration:none;
+  transition:all 0.2s;
+  white-space:nowrap;
+}
+.btn-outline:hover{
+  background:rgba(212,160,23,0.1);
+  border-color:var(--gold);
+}
+.hero-stats{
+  position:absolute;bottom:0;left:0;right:0;
+  display:flex;justify-content:center;gap:0;
+  background:rgba(8,8,16,0.7);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  z-index:2;
+}
+.stat-item{
+  padding:1.2rem 3rem;
+  text-align:center;
+  border-left:1px solid var(--border);
+}
+.stat-item:last-child{border-left:none;}
+.stat-num{
+  font-family:'Cairo',sans-serif;
+  font-size:1.8rem;font-weight:900;
+  color:var(--gold);display:block;
+}
+.stat-label{
+  font-size:0.8rem;color:var(--text3);font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;
+}
+
+/* ===================== FEATURES SECTION ===================== */
+.features-section{
+  padding:6rem 2rem;
+  background:var(--dark2);
+}
+.section-title{
+  text-align:center;
+  margin-bottom:4rem;
+}
+.section-title h2{
+  font-family:'Cairo',sans-serif;
+  font-size:2.5rem;font-weight:900;
+  margin-bottom:0.8rem;
+}
+.section-title p{color:var(--text2);font-size:1rem;}
+.gold-divider{
+  width:60px;height:3px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  margin:1rem auto;
+}
+.features-grid{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;
+}
+.feature-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:2rem;
+  transition:border-color 0.3s,transform 0.3s;
+  position:relative;overflow:hidden;
+}
+.feature-card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  transform:scaleX(0);
+  transition:transform 0.4s;
+}
+.feature-card:hover{border-color:var(--border2);transform:translateY(-5px);}
+.feature-card:hover::before{transform:scaleX(1);}
+.feature-icon{
+  font-size:2.5rem;
+  margin-bottom:1rem;
+  display:block;
+}
+.feature-card h3{
+  font-family:'Cairo',sans-serif;
+  font-size:1.2rem;font-weight:700;
+  margin-bottom:0.6rem;
+  color:var(--gold);
+}
+.feature-card p{color:var(--text2);font-size:0.9rem;line-height:1.8;}
+
+/* ===================== LAWS PAGE ===================== */
+#page-laws{background:var(--dark2);}
+.laws-wrapper{
+  max-width:950px;margin:0 auto;
+  padding:3rem 2rem 5rem;
+}
+.laws-container{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+}
+.law-item{border-bottom:1px solid var(--border);}
+.law-item:last-child{border-bottom:none;}
+.law-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 1.6rem;
+  cursor:pointer;
+  transition:background 0.2s;
+  user-select:none;
+}
+.law-header:hover{background:rgba(212,160,23,0.04);}
+.law-header-r{display:flex;align-items:center;gap:1rem;}
+.law-dot{
+  width:8px;height:8px;
+  background:var(--gold);border-radius:50%;
+  flex-shrink:0;
+  box-shadow:0 0 8px rgba(212,160,23,0.6);
+}
+.law-title-text{font-size:1rem;font-weight:700;color:var(--text);}
+.law-toggle{
+  width:30px;height:30px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--border);border-radius:6px;
+  color:var(--gold);font-size:1.3rem;font-weight:300;
+  transition:all 0.3s;flex-shrink:0;
+}
+.law-item.open .law-toggle{
+  background:var(--gold);color:#000;
+  transform:rotate(45deg);
+}
+.law-body{max-height:0;overflow:hidden;transition:max-height 0.45s ease;}
+.law-item.open .law-body{max-height:600px;}
+.law-body-inner{
+  padding:1.2rem 1.6rem 1.6rem;
+  color:var(--text2);
+  font-size:0.95rem;line-height:2;
+  border-top:1px solid var(--border);
+}
+
+/* ===================== APPLY PAGE ===================== */
+#page-apply{background:var(--dark2);}
+.apply-wrapper{
+  max-width:800px;margin:0 auto;
+  padding:3rem 2rem 5rem;
+}
+.apply-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:3rem;
+}
+
+/* Progress */
+.progress-track{
+  display:flex;gap:0;
+  margin-bottom:3rem;
+  border-bottom:1px solid var(--border);
+  padding-bottom:1.5rem;
+}
+.prog-step{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;gap:0.4rem;
+  position:relative;
+}
+.prog-step::before{
+  content:'';
+  position:absolute;top:15px;right:50%;
+  width:100%;height:2px;
+  background:var(--border);
+  z-index:0;
+}
+.prog-step:last-child::before{display:none;}
+.prog-num{
+  width:32px;height:32px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;font-weight:700;
+  border:2px solid var(--border);
+  background:var(--dark3);
+  color:var(--text3);
+  position:relative;z-index:1;
+  transition:all 0.3s;
+}
+.prog-label{
+  font-size:0.75rem;color:var(--text3);
+  font-weight:600;text-align:center;
+  white-space:nowrap;
+}
+.prog-step.done .prog-num{
+  background:var(--gold);border-color:var(--gold);
+  color:#000;
+}
+.prog-step.done .prog-label{color:var(--gold);}
+.prog-step.current .prog-num{
+  background:rgba(212,160,23,0.15);
+  border-color:var(--gold);color:var(--gold);
+  box-shadow:0 0 16px rgba(212,160,23,0.3);
+}
+.prog-step.current .prog-label{color:var(--gold);}
+.prog-step.done::before{background:var(--gold);}
+
+/* Steps */
+.apply-step{display:none;}
+.apply-step.active{display:block;animation:fadeUp 0.4s ease both;}
+
+.step-head{margin-bottom:2rem;}
+.step-head h2{
+  font-family:'Cairo',sans-serif;
+  font-size:1.7rem;font-weight:900;
+  margin-bottom:0.4rem;
+}
+.step-head p{color:var(--text2);font-size:0.9rem;}
+
+/* Forms */
+.form-group{margin-bottom:1.4rem;}
+.form-label{
+  display:block;font-size:0.9rem;font-weight:700;
+  color:var(--text);margin-bottom:0.5rem;
+}
+.form-input,.form-textarea,.form-select{
+  width:100%;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:0.85rem 1rem;
+  color:var(--text);
+  font-family:'Tajawal',sans-serif;
+  font-size:0.95rem;
+  outline:none;
+  transition:border-color 0.3s,box-shadow 0.3s,background 0.3s;
+  direction:rtl;
+}
+.form-input:focus,.form-textarea:focus,.form-select:focus{
+  border-color:var(--gold);
+  background:rgba(212,160,23,0.04);
+  box-shadow:0 0 0 3px rgba(212,160,23,0.1);
+}
+.form-textarea{resize:vertical;min-height:100px;}
+.form-select option{background:var(--dark3);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}}
+
+/* Discord Login Step */
+.discord-step-inner{text-align:center;padding:3rem 0;}
+.big-discord-icon{
+  width:80px;height:80px;
+  background:#5865F2;border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.5rem;
+  box-shadow:0 8px 32px rgba(88,101,242,0.4);
+}
+.discord-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:0.8rem;
+  background:#5865F2;
+  color:#fff;
+  font-family:'Cairo',sans-serif;
+  font-size:1.1rem;font-weight:700;
+  padding:1rem 2.5rem;
+  border:none;border-radius:10px;
+  cursor:pointer;text-decoration:none;
+  transition:background 0.2s,transform 0.2s,box-shadow 0.2s;
+  width:100%;
+  margin-top:1.5rem;
+}
+.discord-btn:hover{
+  background:#4752C4;
+  transform:translateY(-2px);
+  box-shadow:0 10px 30px rgba(88,101,242,0.4);
+}
+.logged-in-box{
+  background:rgba(56,161,105,0.1);
+  border:1px solid rgba(56,161,105,0.3);
+  border-radius:10px;
+  padding:1rem 1.5rem;
+  display:flex;align-items:center;gap:1rem;
+  margin:1.5rem 0;
+}
+.logged-in-avatar{
+  width:48px;height:48px;border-radius:50%;
+  border:2px solid var(--green);object-fit:cover;
+}
+.logged-in-info{text-align:right;}
+.logged-in-info strong{display:block;color:var(--green);font-size:1rem;}
+.logged-in-info span{font-size:0.8rem;color:var(--text2);}
+
+/* Buttons */
+.btn-row{
+  display:flex;align-items:center;gap:0.8rem;
+  margin-top:2rem;flex-wrap:wrap;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--gold),var(--gold3));
+  color:#000;
+  font-family:'Cairo',sans-serif;
+  font-size:1rem;font-weight:700;
+  padding:0.85rem 2rem;
+  border:none;border-radius:8px;
+  cursor:pointer;
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 30px rgba(212,160,23,0.35);
+}
+.btn-back{
+  background:transparent;
+  color:var(--text2);
+  font-family:'Cairo',sans-serif;
+  font-size:0.95rem;font-weight:600;
+  padding:0.85rem 1.5rem;
+  border:1px solid var(--border);
+  border-radius:8px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-back:hover{border-color:var(--gold);color:var(--gold);}
+
+/* Random Qs badge */
+.random-label{
+  display:inline-flex;align-items:center;gap:0.4rem;
+  background:rgba(212,160,23,0.12);
+  border:1px solid rgba(212,160,23,0.3);
+  color:var(--gold);
+  font-size:0.75rem;font-weight:700;
+  padding:0.2rem 0.7rem;
+  border-radius:4px;
+  margin-right:0.5rem;
+}
+
+/* Success */
+.success-card{
+  text-align:center;padding:2rem 0;
+}
+.success-icon{
+  width:80px;height:80px;
+  background:rgba(56,161,105,0.15);
+  border:2px solid var(--green);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;margin:0 auto 1.5rem;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(56,161,105,0.4);}
+  50%{box-shadow:0 0 0 16px rgba(56,161,105,0);}
+}
+.success-card h2{
+  font-family:'Cairo',sans-serif;
+  font-size:2rem;font-weight:900;
+  color:var(--green);margin-bottom:0.8rem;
+}
+.success-card p{
+  color:var(--text2);line-height:1.9;
+  font-size:0.95rem;max-width:500px;margin:0 auto 2rem;
+}
+.info-chips{
+  display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;
+  margin-bottom:2rem;
+}
+.chip{
+  display:flex;align-items:center;gap:0.4rem;
+  background:rgba(212,160,23,0.08);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:0.5rem 1rem;
+  font-size:0.85rem;color:var(--text2);
+}
+.chip strong{color:var(--gold);}
+
+/* ===================== STORE PAGE ===================== */
+#page-store{background:var(--dark2);}
+.store-wrapper{
+  max-width:1300px;margin:0 auto;
+  padding:3rem 2rem 6rem;
+}
+.store-tabs{
+  display:flex;gap:0.5rem;
+  margin-bottom:3rem;
+  border-bottom:1px solid var(--border);
+  padding-bottom:0;
+  overflow-x:auto;
+}
+.store-tab{
+  padding:0.8rem 1.5rem;
+  font-family:'Cairo',sans-serif;font-size:0.95rem;font-weight:700;
+  color:var(--text2);background:transparent;
+  border:none;border-bottom:2px solid transparent;
+  cursor:pointer;
+  transition:all 0.2s;white-space:nowrap;
+  margin-bottom:-1px;
+}
+.store-tab:hover{color:var(--gold);}
+.store-tab.active{
+  color:var(--gold);
+  border-bottom-color:var(--gold);
+}
+.store-category{display:none;}
+.store-category.active{display:block;animation:fadeUp 0.3s ease both;}
+.store-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1.5rem;
+}
+.store-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  transition:transform 0.3s,border-color 0.3s,box-shadow 0.3s;
+}
+.store-card:hover{
+  transform:translateY(-6px);
+  border-color:var(--border2);
+  box-shadow:0 20px 50px rgba(0,0,0,0.5);
+}
+.store-card-img{
+  height:180px;
+  background:var(--dark3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;
+  position:relative;overflow:hidden;
+}
+.store-card-img::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 40%,rgba(16,16,28,0.8));
+}
+.store-badge{
+  position:absolute;top:0.8rem;right:0.8rem;
+  background:linear-gradient(135deg,var(--gold),var(--gold3));
+  color:#000;font-size:0.7rem;font-weight:900;
+  padding:0.25rem 0.7rem;border-radius:4px;
+  letter-spacing:1px;text-transform:uppercase;
+  z-index:1;
+}
+.store-card-body{padding:1.3rem;}
+.store-card-body h3{
+  font-family:'Cairo',sans-serif;
+  font-size:1.05rem;font-weight:800;
+  margin-bottom:0.4rem;
+  color:var(--text);
+}
+.store-card-body p{
+  color:var(--text2);font-size:0.85rem;line-height:1.7;
+  margin-bottom:1rem;
+}
+.store-features{
+  list-style:none;margin-bottom:1.2rem;
+}
+.store-features li{
+  font-size:0.82rem;color:var(--text2);
+  padding:0.2rem 0;
+  display:flex;align-items:center;gap:0.5rem;
+}
+.store-features li::before{content:'◈';color:var(--gold);font-size:0.6rem;}
+.store-price-row{
+  display:flex;align-items:center;justify-content:space-between;
+}
+.store-price{
+  font-family:'Cairo',sans-serif;
+  font-size:1.3rem;font-weight:900;
+  color:var(--gold);
+}
+.store-price span{font-size:0.7rem;color:var(--text3);font-weight:400;}
+.btn-buy{
+  background:linear-gradient(135deg,var(--gold),var(--gold3));
+  color:#000;
+  font-family:'Cairo',sans-serif;font-size:0.85rem;font-weight:700;
+  padding:0.5rem 1.2rem;
+  border:none;border-radius:6px;cursor:pointer;
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.btn-buy:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(212,160,23,0.4);
+}
+
+/* VIP TIER CARD */
+.vip-tier{
+  border-radius:14px;overflow:hidden;
+  border:1px solid var(--border);
+  background:var(--card);
+  transition:transform 0.3s,border-color 0.3s;
+}
+.vip-tier:hover{transform:translateY(-6px);border-color:var(--border2);}
+.vip-tier.featured{
+  border-color:var(--gold);
+  box-shadow:0 0 30px rgba(212,160,23,0.2);
+}
+.vip-header{
+  padding:1.5rem 2rem;
+  text-align:center;
+  position:relative;
+}
+.vip-tier-1 .vip-header{background:linear-gradient(135deg,#2a2010,#1a1008);}
+.vip-tier-2 .vip-header{background:linear-gradient(135deg,#252030,#151020);}
+.vip-tier-3 .vip-header{background:linear-gradient(135deg,#302010,#201008);}
+.vip-crown{font-size:2.5rem;display:block;margin-bottom:0.5rem;}
+.vip-name{
+  font-family:'Cairo',sans-serif;font-size:1.3rem;font-weight:900;
+  color:var(--gold);
+}
+.vip-price{
+  font-family:'Cairo',sans-serif;font-size:2.2rem;font-weight:900;
+  color:var(--text);margin:0.8rem 0 0.3rem;
+}
+.vip-period{font-size:0.8rem;color:var(--text3);}
+.vip-body{padding:1.8rem 2rem;}
+.vip-features{list-style:none;}
+.vip-features li{
+  display:flex;align-items:center;gap:0.7rem;
+  padding:0.6rem 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  font-size:0.9rem;color:var(--text2);
+}
+.vip-features li:last-child{border-bottom:none;}
+.vip-features li .check{color:var(--green);font-size:1rem;}
+.btn-vip{
+  width:100%;margin-top:1.5rem;
+  background:linear-gradient(135deg,var(--gold),var(--gold3));
+  color:#000;
+  font-family:'Cairo',sans-serif;font-size:1rem;font-weight:700;
+  padding:0.9rem;border:none;border-radius:8px;cursor:pointer;
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.btn-vip:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(212,160,23,0.4);}
+.vip-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1.5rem;
+}
+
+/* ===================== FOOTER ===================== */
+footer{
+  background:var(--dark);
+  border-top:1px solid var(--border);
+  padding:3rem 2rem 2rem;
+  text-align:center;
+}
+.footer-logo{
+  font-family:'Cairo',sans-serif;font-size:2rem;font-weight:900;
+  color:var(--gold);margin-bottom:0.5rem;
+}
+.footer-desc{color:var(--text3);font-size:0.85rem;margin-bottom:1.5rem;}
+.footer-links{
+  display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;
+  margin-bottom:2rem;
+}
+.footer-links a{
+  color:var(--text2);font-size:0.85rem;text-decoration:none;
+  transition:color 0.2s;cursor:pointer;
+}
+.footer-links a:hover{color:var(--gold);}
+.footer-copy{color:var(--text3);font-size:0.8rem;}
+
+/* ===================== TOAST ===================== */
+#toast{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:0.9rem 1.8rem;
+  font-size:0.95rem;font-weight:600;
+  z-index:99999;transition:transform 0.4s;
+  white-space:nowrap;
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.success{border-color:rgba(56,161,105,0.5);color:var(--green);}
+#toast.error{border-color:rgba(229,62,62,0.5);color:var(--red);}
+
+/* ===================== ANIMATIONS ===================== */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(24px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media(max-width:768px){
+  #navbar{padding:0 1.2rem;}
+  .nav-links{display:none;}
+  .stat-item{padding:1rem 1.2rem;}
+  .apply-card{padding:1.5rem;}
+  .store-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav id="navbar">
+  <div class="nav-logo" onclick="navigate('home')">
+    <div class="nav-logo-hex">MA</div>
+    <span class="nav-logo-text">سيرفر MA</span>
+  </div>
+  <ul class="nav-links">
+    <li><a id="nl-home" class="active" onclick="navigate('home')">الرئيسية</a></li>
+    <li><a id="nl-laws" onclick="navigate('laws')">القوانين</a></li>
+    <li><a id="nl-apply" onclick="navigate('apply')">تقديم</a></li>
+    <li><a id="nl-store" onclick="navigate('store')">المتجر</a></li>
+  </ul>
+  <div class="nav-user" id="nav-user-area">
+    <a href="/auth/discord" class="btn-gold" style="padding:0.45rem 1.2rem;font-size:0.85rem;">
+      تسجيل الدخول
+    </a>
+  </div>
+</nav>
+
+<!-- ===== TOAST ===== -->
+<div id="toast"></div>
+
+<!-- ===================== HOME PAGE ===================== -->
+<div id="page-home" class="page active">
+
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-particles" id="particles"></div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">GTA V Roleplay Server</div>
+      <h1 class="hero-title">
+        <span class="gold">MA</span><br>
+        <span class="stroke">سيرفر</span> رول بلاي
+      </h1>
+      <p class="hero-desc">
+        أهلاً بك في سيرفر MA المتخصص في الرول بلاي<br>
+        نحاول جاهدين تقديم أفضل تجربة للرول بلاي في الشرق الأوسط<br>
+        انضم إلينا الآن وعيش حياتك كما تريد
+      </p>
+      <div class="hero-btns">
+        <button class="btn-gold" onclick="navigate('apply')">
+          🎮 قدّم الآن
+        </button>
+        <button class="btn-outline" onclick="navigate('laws')">
+          📜 القوانين
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">500+</span>
+        <span class="stat-label">لاعب نشط</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">24/7</span>
+        <span class="stat-label">سيرفر يشتغل</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">50+</span>
+        <span class="stat-label">وظيفة متاحة</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">#1</span>
+        <span class="stat-label">تجربة رول بلاي</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section">
+    <div class="section-title">
+      <h2>لماذا سيرفر MA؟</h2>
+      <div class="gold-divider"></div>
+      <p>نقدم لك تجربة رول بلاي لا مثيل لها</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🏙️</span>
+        <h3>مدينة حية</h3>
+        <p>اشعر بحياة حقيقية داخل المدينة مع سكان وأحداث يومية متجددة تجعل كل لحظة مختلفة</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚖️</span>
+        <h3>نظام قانوني متكامل</h3>
+        <p>شرطة وقضاء ومحاكم حقيقية داخل اللعبة، عيش تجربة القانون والنظام بشكل واقعي</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💼</span>
+        <h3>وظائف متنوعة</h3>
+        <p>أكثر من 50 وظيفة من شرطة وإسعاف وعصابات ومحلات تجارية وغيرها الكثير</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🚗</span>
+        <h3>سيارات مخصصة</h3>
+        <p>آلاف السيارات المخصصة والنادرة، امتلك سيارة أحلامك واعدّلها كما تشاء</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🏘️</span>
+        <h3>عقارات وسكن</h3>
+        <p>اشتري شقتك أو بيتك الخاص وزيّنه كما تحب، واجعله وطنك داخل المدينة</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🎭</span>
+        <h3>إدارة محترفة</h3>
+        <p>فريق إداري على أعلى مستوى يعمل 24/7 لضمان تجربة عادلة وممتعة للجميع</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">MA</div>
+    <p class="footer-desc">سيرفر رول بلاي — أفضل تجربة رول بلاي عربية</p>
+    <div class="footer-links">
+      <a onclick="navigate('home')">الرئيسية</a>
+      <a onclick="navigate('laws')">القوانين</a>
+      <a onclick="navigate('apply')">التقديم</a>
+      <a onclick="navigate('store')">المتجر</a>
+    </div>
+    <p class="footer-copy">© 2024 MA Server. جميع الحقوق محفوظة.</p>
+  </footer>
+
+</div>
+
+<!-- ===================== LAWS PAGE ===================== -->
+<div id="page-laws" class="page">
+  <div class="laws-wrapper">
+    <div class="section-title" style="margin-bottom:3rem;">
+      <h2>القوانين</h2>
+      <div class="gold-divider"></div>
+      <p>يجب أن يكون لديك اطلاع كامل على قوانين سيرفر MA قبل التقديم</p>
+    </div>
+    <div class="laws-container" id="laws-accordion">
+      <!-- Laws injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APPLY PAGE ===================== -->
+<div id="page-apply" class="page">
+  <div class="apply-wrapper">
+    <div class="section-title" style="margin-bottom:2rem;">
+      <h2>تقديم الطلب</h2>
+      <div class="gold-divider"></div>
+      <p>أكمل الخطوات للانضمام إلى سيرفر MA</p>
+    </div>
+
+    <div class="apply-card">
+      <!-- Progress -->
+      <div class="progress-track">
+        <div class="prog-step current" id="ps0">
+          <div class="prog-num">1</div>
+          <div class="prog-label">الديسكورد</div>
+        </div>
+        <div class="prog-step" id="ps1">
+          <div class="prog-num">2</div>
+          <div class="prog-label">معلوماتك</div>
+        </div>
+        <div class="prog-step" id="ps2">
+          <div class="prog-num">3</div>
+          <div class="prog-label">أسئلة RP</div>
+        </div>
+        <div class="prog-step" id="ps3">
+          <div class="prog-num">✓</div>
+          <div class="prog-label">تم الإرسال</div>
+        </div>
+      </div>
+
+      <!-- Step 0: Discord -->
+      <div class="apply-step active" id="step-0">
+        <div class="step-head">
+          <h2>تسجيل الدخول بالديسكورد</h2>
+          <p>سجّل دخولك بحساب Discord الخاص بك للمتابعة</p>
+        </div>
+        <div class="discord-step-inner">
+          <div class="big-discord-icon">
+            <svg width="44" height="33" viewBox="0 0 71 55" fill="white" xmlns="http://www.w3.org/2000/svg">
+              <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.44077 45.4204 0.52529C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.52529C25.5141 0.44359 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978Z"/>
+            </svg>
+          </div>
+
+          <div id="discord-not-logged">
+            <p style="color:var(--text2);line-height:1.9;font-size:0.95rem;">
+              سيتم توجيهك إلى Discord لتسجيل الدخول<br>
+              تأكد من تسجيل الدخول بالحساب الصحيح
+            </p>
+            <a href="/auth/discord" class="discord-btn">
+              <svg width="22" height="17" viewBox="0 0 71 55" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.44077 45.4204 0.52529C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.52529C25.5141 0.44359 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978Z"/>
+              </svg>
+              تسجيل الدخول بـ Discord
+            </a>
+          </div>
+
+          <div id="discord-logged" style="display:none;">
+            <div class="logged-in-box">
+              <img id="discord-avatar" class="logged-in-avatar" src="" alt="avatar">
+              <div class="logged-in-info">
+                <strong id="discord-name">—</strong>
+                <span>تم تسجيل الدخول بنجاح ✓</span>
+              </div>
+            </div>
+            <div class="btn-row" style="justify-content:center;">
+              <button class="btn-primary" onclick="goToStep(1)">متابعة ←</button>
+              <button class="btn-back" onclick="location.href='/auth/logout'">تسجيل خروج</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 1: Basic Info -->
+      <div class="apply-step" id="step-1">
+        <div class="step-head">
+          <h2>المعلومات الأساسية</h2>
+          <p>أدخل معلوماتك الشخصية ومعلومات شخصيتك</p>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">اسمك الحقيقي؟</label>
+            <input type="text" class="form-input" id="f-real-name" placeholder="اكتب اسمك الحقيقي...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">عمرك الحقيقي؟</label>
+            <input type="number" class="form-input" id="f-age" min="13" max="60" placeholder="اكتب عمرك...">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">أي دي الديسكورد الخاص بك؟</label>
+            <input type="text" class="form-input" id="f-discord-id" placeholder="123456789012345678">
+          </div>
+          <div class="form-group">
+            <label class="form-label">يوزر الديسكورد الخاص بك؟</label>
+            <input type="text" class="form-input" id="f-discord-user" placeholder="username">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">اسم الشخصية؟</label>
+          <input type="text" class="form-input" id="f-char-name" placeholder="اكتب اسم شخصيتك في الرول بلاي...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">قصة الشخصية؟</label>
+          <textarea class="form-textarea" id="f-char-story" rows="4" placeholder="اكتب قصة شخصيتك بالتفصيل..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ما هو تعريفك للرول بلاي؟</label>
+          <textarea class="form-textarea" id="f-rp-def" rows="3" placeholder="عرّف الرول بلاي بكلماتك الخاصة..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="validateStep1()">التالي ←</button>
+          <button class="btn-back" onclick="goToStep(0)">← رجوع</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Random RP Questions -->
+      <div class="apply-step" id="step-2">
+        <div class="step-head">
+          <h2>أسئلة الرول بلاي <span class="random-label">🎲 عشوائية</span></h2>
+          <p>أجب على هذه الأسئلة بصدق — يتم اختيارها عشوائياً لكل متقدم</p>
+        </div>
+        <div id="rp-questions-container"></div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="submitApp()">إرسال الطلب ✓</button>
+          <button class="btn-back" onclick="goToStep(1)">← رجوع</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Success -->
+      <div class="apply-step" id="step-3">
+        <div class="success-card">
+          <div class="success-icon">✓</div>
+          <h2>تم إرسال طلبك!</h2>
+          <p>
+            تم إرسال طلبك بنجاح إلى فريق الإدارة في سيرفر MA<br>
+            سيتم مراجعة طلبك في أقرب وقت
+          </p>
+          <div class="info-chips">
+            <div class="chip">✅ في حال القبول: <strong>ستحصل على الرتبة</strong></div>
+            <div class="chip">📩 سيصلك رد عبر <strong>رسالة خاصة على Discord</strong></div>
+            <div class="chip">❌ في حال الرفض: <strong>ستصلك رسالة توضيحية</strong></div>
+          </div>
+          <button class="btn-primary" onclick="navigate('home')">العودة للرئيسية</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===================== STORE PAGE ===================== -->
+<div id="page-store" class="page">
+  <div class="store-wrapper">
+    <div class="section-title" style="margin-bottom:2rem;">
+      <h2>المتجر</h2>
+      <div class="gold-divider"></div>
+      <p>احصل على أفضل الباكدجات والسيارات والإكسسوارات</p>
+    </div>
+
+    <div class="store-tabs">
+      <button class="store-tab active" onclick="switchTab('vip',this)">⭐ باكدجات VIP</button>
+      <button class="store-tab" onclick="switchTab('cars',this)">🚗 سيارات</button>
+      <button class="store-tab" onclick="switchTab('houses',this)">🏠 سكنات</button>
+      <button class="store-tab" onclick="switchTab('accessories',this)">🎒 إكسسوارات</button>
+    </div>
+
+    <!-- VIP -->
+    <div id="tab-vip" class="store-category active">
+      <div class="vip-grid">
+        <div class="vip-tier vip-tier-1">
+          <div class="vip-header">
+            <span class="vip-crown">🥉</span>
+            <div class="vip-name">Bronze VIP</div>
+            <div class="vip-price">$5 <span>/ شهر</span></div>
+          </div>
+          <div class="vip-body">
+            <ul class="vip-features">
+              <li><span class="check">✓</span> رتبة Bronze في الديسكورد</li>
+              <li><span class="check">✓</span> لون اسم مخصص</li>
+              <li><span class="check">✓</span> $50,000 دولار في اللعبة</li>
+              <li><span class="check">✓</span> سيارة Bronze حصرية</li>
+              <li><span class="check">✓</span> أولوية في التقديم</li>
+            </ul>
+            <button class="btn-vip">احصل عليه</button>
+          </div>
+        </div>
+        <div class="vip-tier vip-tier-2 featured">
+          <div class="vip-header">
+            <span class="vip-crown">🥈</span>
+            <div class="vip-name">Silver VIP</div>
+            <div class="vip-price">$10 <span>/ شهر</span></div>
+          </div>
+          <div class="vip-body">
+            <ul class="vip-features">
+              <li><span class="check">✓</span> كل مزايا Bronze</li>
+              <li><span class="check">✓</span> رتبة Silver في الديسكورد</li>
+              <li><span class="check">✓</span> $150,000 دولار في اللعبة</li>
+              <li><span class="check">✓</span> سيارة Silver حصرية</li>
+              <li><span class="check">✓</span> منزل مجاني</li>
+              <li><span class="check">✓</span> تخصيص الشخصية</li>
+            </ul>
+            <button class="btn-vip">احصل عليه</button>
+          </div>
+        </div>
+        <div class="vip-tier vip-tier-3">
+          <div class="vip-header">
+            <span class="vip-crown">👑</span>
+            <div class="vip-name">Gold VIP</div>
+            <div class="vip-price">$20 <span>/ شهر</span></div>
+          </div>
+          <div class="vip-body">
+            <ul class="vip-features">
+              <li><span class="check">✓</span> كل مزايا Silver</li>
+              <li><span class="check">✓</span> رتبة Gold في الديسكورد</li>
+              <li><span class="check">✓</span> $500,000 دولار في اللعبة</li>
+              <li><span class="check">✓</span> سيارة Gold حصرية</li>
+              <li><span class="check">✓</span> منزل فاخر مجاني</li>
+              <li><span class="check">✓</span> دعم أولوية قصوى</li>
+              <li><span class="check">✓</span> وصول لمناطق VIP حصرية</li>
+            </ul>
+            <button class="btn-vip">احصل عليه</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cars -->
+    <div id="tab-cars" class="store-category">
+      <div class="store-grid" id="cars-grid">
+        <!-- JS injected -->
+      </div>
+    </div>
+
+    <!-- Houses -->
+    <div id="tab-houses" class="store-category">
+      <div class="store-grid" id="houses-grid"></div>
+    </div>
+
+    <!-- Accessories -->
+    <div id="tab-accessories" class="store-category">
+      <div class="store-grid" id="accessories-grid"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const LAWS = [
+  { title: 'قوانين الحياة الجديدة - NLR', body: 'في حال وفاتك بشكل كامل، لا يمكنك الكلام أو الحركة أو فعل أي شيء. في حال تم إسقاطك من قبل شخص وتم الانتهاء منك، تستطيع تذكر جميع الأحداث فقط في حال تم إعطاءك إبرة في العيادة الخاصة، من قبل اللاعبين الذين لديهم عداوة معك. لا تستطيع تذكر أي شيء حصل لك (منها الصفقات أو الأحداث).', open: true },
+  { title: 'الباور جيمنج - PowerGaming', body: 'PowerGaming هو استخدام قدرات أو معلومات لا يمتلكها شخصيتك داخل الرول بلاي لتحقيق ميزة غير عادلة. مثال: التصرف بشكل خارق أو فعل أشياء مستحيلة على الشخصية، أو إجبار لاعب آخر على القيام بأفعال لا يريدها.' },
+  { title: 'الخوف على الحياة - NVL', body: 'NVL أو No Value of Life يعني عدم تقدير حياة شخصيتك. يجب أن تتصرف بواقعية وتخاف على حياتك عند مواجهة التهديدات المسلحة. تجاهل التهديدات الجدية يُعتبر مخالفة صريحة.' },
+  { title: 'الميتا جيمنج - MetaGaming', body: 'MetaGaming هو استخدام معلومات حصلت عليها خارج نطاق الرول بلاي (مثل Discord أو مقاطع الفيديو أو Streaming) داخل اللعبة. شخصيتك لا تعلم إلا ما واجهته وسمعته داخل اللعبة فقط.' },
+  { title: 'القتل العشوائي - RDM', body: 'RDM أو Random Death Match يعني قتل لاعبين بدون سبب مقبول داخل الرول بلاي. يجب أن يكون لديك مبرر رول بلاي واضح ومقنع قبل مهاجمة أي لاعب.' },
+  { title: 'قانون تقدير الحياة - NWL', body: 'يجب احترام حياة الشخصيات الأخرى والتعامل مع كل موقف بجدية كما لو كان في الواقع. عدم الاكتراث بحياة شخصيتك أو شخصيات الآخرين يُعد مخالفة.' },
+  { title: 'القوانين العامة', body: 'ممنوع الشتم أو القذف أو الطائفية أو التطرق للسياسة والدين. ممنوع استخدام كلمات مشفرة أو سب مبطن. يجب الالتزام بالاحترام الكامل مع جميع اللاعبين والإدارة في أي وقت.' },
+  { title: 'نظام الوورنات', body: 'يتلقى اللاعب تحذيرات عند مخالفة القوانين. عند تجمع عدد محدد من التحذيرات يتم اتخاذ إجراءات أشد بحق اللاعب قد تصل إلى الحظر الدائم من السيرفر.' },
+  { title: 'قوانين الشرطة', body: 'لا يُسمح بملاحقة العساكر بهدف المضايقة أو الترصد لهم. يجب احترام رجال الشرطة أثناء تأدية مهامهم. لا يحق لك مقاومة الاعتقال بالقوة دون مبرر منطقي.' },
+  { title: 'قوانين الاسعاف', body: 'لا يجوز استخدام خدمات الإسعاف أو التاكسي بغرض الخطف أو القتل. طاقم الإسعاف محايدون ويجب معاملتهم باحترام في جميع الأوقات.' },
+  { title: 'قوانين العصابات', body: 'لا يمكن تكوين عداوة بسبب مشادة كلامية فقط. لا يحق لك أخذ رهينة من أصدقائك أو أفراد عصابتك. الخطف يجب أن يكون له سبب منطقي ومقنع داخل الرول بلاي.' },
+  { title: 'قوانين العدل', body: 'عند حدوث مشكلة يجب فتح تذكرة بدل تكوين عداوة. لا يحق لك أخذ القانون بيدك دون الرجوع للإدارة في الحالات المعقدة.' },
+  { title: 'قوانين الاجرام', body: 'السرقة مسموحة في أماكن محددة فقط. لا يجوز قتل شخص إذا كان ينفذ أوامرك. لا يُسمح بخطف شخص في مكان عام أو مزدحم. يجب وجود معرفة رول بلاي مسبقة (الحد الأدنى ساعتين) قبل الدخول في صفقات كبيرة أو أحداث مهمة.' },
+];
+
+const RP_QUESTIONS_POOL = [
+  'ما هو الـ NVL ؟',
+  'ما هو الـ PowerGaming ؟',
+  'ما هو الـ MetaGaming ؟',
+  'ما هو الـ VDM ؟',
+  'ما هو الـ RDM ؟',
+  'هل يُسمح بملاحقة العساكر بهدف المضايقة أو الترصد لهم؟',
+  'متى يُسمح لك بمغادرة المدينة بعد انتهاء السيناريو؟',
+  'هل يمكن تكوين عداوة بسبب مشادة كلامية فقط؟',
+  'ماذا يجب أن تفعل إذا حصل حادث سيارة بسيط مع شخص آخر؟',
+  'هل يُسمح بالخطف بدون سبب منطقي؟',
+  'ما الإجراء الصحيح عند حدوث مشكلة بدل تكوين عداوة؟',
+  'هل يمكنك الدخول في سيناريو مع شخص لا تعرفه رول بلاي؟',
+  'كم المدة المطلوبة لمعرفة شخص رول بلاي قبل الدخول معه في سيناريو؟',
+  'هل يجوز طلب تاكسي أو إسعاف بهدف الخطف أو السرقة؟',
+  'ماذا يجب أن تفعل إذا تم تهديدك بسلاح؟',
+  'هل يُسمح بخطف شخص في مكان عام أو مزدحم؟',
+  'هل يمكنك أخذ رهينة من أصدقائك أو أفراد عصابتك؟',
+  'هل يجوز قتل شخص إذا كان ينفذ أوامرك؟',
+  'في أي الأماكن يُسمح بالسرقة حسب القوانين؟',
+  'متى يُسمح بسرقة العسكري أو المواطن بشكل قانوني داخل الرول بلاي؟',
+  'هل يُسمح بالاعتداء على البوتات داخل اللعبة؟',
+  'ماذا يُعتبر البوتات في السيرفر؟',
+  'هل يحق لك طلب تعويض إذا خسرت أموالك بسبب التحلل أو المستشفى؟',
+  'هل يمكن الكتابة خارج إطار الرول بلاي في تطبيق تويتر؟',
+  'متى يُسمح لك بالكتابة في تويتر داخل اللعبة؟',
+  'هل يمكنك الدخول في صفقات كبيرة (بيع وشراء) بدون معرفة رول بلاي مسبقة؟',
+  'ما الحد الأدنى لمدة المعرفة المطلوبة للدخول في أحداث كبيرة؟',
+  'ما العقوبة على القذف أو الشتم أو الطائفية أو التطرق للسياسة والدين؟',
+  'هل يُسمح باستخدام كلمات مشفرة أو سب مبطن؟',
+  'هل يجوز استخدام خدمات الجوال (تاكسي، إلخ) بغرض الخطف أو القتل؟',
+  'متى يُسمح بتوزيع مبالغ مالية كبيرة (10 آلاف أو أكثر)؟',
+  'هل يمكنك مشاركة حساباتك الشخصية مع الآخرين داخل السيرفر؟',
+  'كم عدد الأشخاص المسموح بحملهم في نفس الوقت؟',
+  'ما المطلوب في أسلوب القيادة داخل السيرفر؟',
+  'ما العقوبة عند القيادة بتهور أو مخالفة قواعد القيادة (مثل قطع الإشارة أو السرعة المفرطة)؟',
+];
+
+const CARS = [
+  { name: 'Bugatti Chiron', price: '$25', emoji: '🏎️', tag: 'ULTRA RARE', desc: 'أسرع سيارة في السيرفر', features: ['سرعة قصوى 420 كمس', 'لون مخصص', 'لوحة حصرية'] },
+  { name: 'Lamborghini Urus', price: '$15', emoji: '🚙', tag: 'RARE', desc: 'SUV فاخر بأداء رياضي', features: ['4×4 كامل', 'تصميم مخصص', 'تعديلات حصرية'] },
+  { name: 'Ferrari SF90', price: '$20', emoji: '🏎️', tag: 'RARE', desc: 'أيقونة الأداء الإيطالي', features: ['محرك هجين', 'لون تخصيص', 'لوحة VIP'] },
+  { name: 'Mercedes G63', price: '$12', emoji: '🚙', tag: 'COMMON', desc: 'الملك الأسطوري في الشوارع', features: ['تعديلات Brabus', 'صوت عادم مميز', 'تخصيص كامل'] },
+  { name: 'BMW M5 CS', price: '$10', emoji: '🚗', tag: 'COMMON', desc: 'سيدان رياضي بأعلى مستوى', features: ['625 حصان', 'تعديلات M-Sport', 'نظام صوت'] },
+  { name: 'Rolls Royce Phantom', price: '$30', emoji: '🚘', tag: 'LEGENDARY', desc: 'الفخامة في أرقى صورها', features: ['أعلى فخامة', 'داخلية جلد', 'نجمي حصري'] },
+];
+
+const HOUSES = [
+  { name: 'شقة وسط المدينة', price: '$8', emoji: '🏢', desc: 'شقة فاخرة في قلب المدينة', features: ['غرفتين', 'إطلالة المدينة', 'جراج خاص', 'تأثيث جاهز'] },
+  { name: 'فيلا الساحل', price: '$18', emoji: '🏖️', desc: 'فيلا فارهة على الشاطئ مباشرة', features: ['5 غرف', 'مسبح خاص', 'إطلالة بحرية', 'أرضية كبيرة'] },
+  { name: 'بنتهاوس سكاي', price: '$35', emoji: '🏙️', tag: 'ULTRA', desc: 'أعلى شقة في أطول برج', features: ['طابق كامل', 'تراس 360°', 'جاكوزي', 'مصعد خاص'] },
+  { name: 'مزرعة المدينة', price: '$12', emoji: '🌾', desc: 'بيت ريفي هادئ خارج المدينة', features: ['مساحة واسعة', 'حديقة كبيرة', 'مزرعة', 'كراج 4 سيارات'] },
+];
+
+const ACCESSORIES = [
+  { name: 'حقيبة Gucci الحصرية', price: '$3', emoji: '👜', desc: 'حقيبة فاخرة حصرية للسيرفر', features: ['تصميم فريد', 'حصري MA', 'قابل للتحويل'] },
+  { name: 'ساعة Rolex ذهبية', price: '$5', emoji: '⌚', desc: 'ساعة فاخرة ذهبية مميزة', features: ['ذهب 18 قيراط', 'يدوية الصنع', 'حصرية VIP'] },
+  { name: 'نظارة Versace', price: '$2', emoji: '🕶️', desc: 'نظارة فاخرة لإطلالة مميزة', features: ['عدسات مرآة', 'إطار ذهبي', 'حصري MA'] },
+  { name: 'سلسلة Diamond', price: '$8', emoji: '💎', desc: 'سلسلة ماسية فاخرة حصرية', features: ['ألماس حقيقي RP', 'حصري Legendary', 'شارة الثروة'] },
+  { name: 'حذاء Jordan حصري', price: '$4', emoji: '👟', desc: 'حذاء رياضي حصري غير متاح للجميع', features: ['إصدار محدود', 'ألوان حصرية', 'MA Edition'] },
+  { name: 'باقة ملابس كاملة', price: '$10', emoji: '👔', desc: 'ورداوب كامل لشخصيتك', features: ['15 قطعة ملبس', 'تصاميم حصرية', 'تخصيص كامل'] },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentUser = null;
+let selectedRPQuestions = [];
+let basicInfoData = {};
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  buildLaws();
+  buildStore();
+  buildParticles();
+  await checkLogin();
+
+  // Handle URL routing
+  const path = window.location.pathname;
+  if (path === '/apply') navigate('apply');
+  else if (path === '/laws') navigate('laws');
+  else if (path === '/store') navigate('store');
+});
+
+// ============================================================
+// CHECK LOGIN
+// ============================================================
+async function checkLogin() {
+  try {
+    const res = await fetch('/auth/me');
+    const data = await res.json();
+    if (data.loggedIn) {
+      currentUser = data.user;
+      showUserInNav(data.user);
+      showUserInApply(data.user);
+    }
+  } catch(e) {}
+}
+
+function showUserInNav(user) {
+  const area = document.getElementById('nav-user-area');
+  const avatar = user.avatar
+    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+    : `https://cdn.discordapp.com/embed/avatars/0.png`;
+  area.innerHTML = `
+    <img src="${avatar}" class="nav-avatar" alt="avatar">
+    <span class="nav-username">${user.global_name || user.username}</span>
+    <button class="btn-logout" onclick="location.href='/auth/logout'">خروج</button>
+  `;
+}
+
+function showUserInApply(user) {
+  document.getElementById('discord-not-logged').style.display = 'none';
+  document.getElementById('discord-logged').style.display = 'block';
+  const avatar = user.avatar
+    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+    : `https://cdn.discordapp.com/embed/avatars/0.png`;
+  document.getElementById('discord-avatar').src = avatar;
+  document.getElementById('discord-name').textContent = user.global_name || user.username;
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const nl = document.getElementById('nl-' + page);
+  if (nl) nl.classList.add('active');
+  window.scrollTo(0, 0);
+  history.pushState({}, '', page === 'home' ? '/' : '/' + page);
+}
+
+// ============================================================
+// LAWS
+// ============================================================
+function buildLaws() {
+  const container = document.getElementById('laws-accordion');
+  LAWS.forEach(law => {
+    const div = document.createElement('div');
+    div.className = 'law-item' + (law.open ? ' open' : '');
+    div.innerHTML = `
+      <div class="law-header" onclick="toggleLaw(this)">
+        <div class="law-header-r">
+          <div class="law-dot"></div>
+          <div class="law-title-text">${law.title}</div>
+        </div>
+        <div class="law-toggle">+</div>
+      </div>
+      <div class="law-body">
+        <div class="law-body-inner">${law.body}</div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function toggleLaw(header) {
+  header.parentElement.classList.toggle('open');
+}
+
+// ============================================================
+// APPLY STEPS
+// ============================================================
+function goToStep(n) {
+  if (n === 1 && !currentUser) {
+    showToast('يجب تسجيل الدخول بالديسكورد أولاً', 'error');
+    return;
+  }
+  document.querySelectorAll('.apply-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  updateProgress(n);
+  window.scrollTo(0, 0);
+
+  if (n === 2) generateRPQuestions();
+}
+
+function updateProgress(current) {
+  for (let i = 0; i <= 3; i++) {
+    const el = document.getElementById('ps' + i);
+    if (!el) continue;
+    el.classList.remove('done', 'current');
+    if (i < current) el.classList.add('done');
+    else if (i === current) el.classList.add('current');
+  }
+}
+
+function validateStep1() {
+  const name = document.getElementById('f-real-name').value.trim();
+  const age = document.getElementById('f-age').value.trim();
+  const charName = document.getElementById('f-char-name').value.trim();
+  const charStory = document.getElementById('f-char-story').value.trim();
+  const rpDef = document.getElementById('f-rp-def').value.trim();
+
+  if (!name || !age || !charName || !charStory || !rpDef) {
+    showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+    return;
+  }
+  if (charStory.length < 50) {
+    showToast('قصة الشخصية قصيرة جداً، أكتب على الأقل 50 حرف', 'error');
+    return;
+  }
+
+  basicInfoData = {
+    realName: name,
+    age,
+    discordId: document.getElementById('f-discord-id').value.trim() || currentUser?.id,
+    discordUser: document.getElementById('f-discord-user').value.trim() || currentUser?.username,
+    charName,
+    charStory,
+    rpDef
+  };
+
+  goToStep(2);
+}
+
+function generateRPQuestions() {
+  const shuffled = [...RP_QUESTIONS_POOL].sort(() => Math.random() - 0.5);
+  selectedRPQuestions = shuffled.slice(0, 7);
+  const container = document.getElementById('rp-questions-container');
+  container.innerHTML = '';
+  selectedRPQuestions.forEach((q, i) => {
+    const d = document.createElement('div');
+    d.className = 'form-group';
+    d.innerHTML = `
+      <label class="form-label">${i+1}. ${q}</label>
+      <textarea class="form-textarea" id="rpq-${i}" rows="2" placeholder="اكتب إجابتك هنا..."></textarea>
+    `;
+    container.appendChild(d);
+  });
+}
+
+async function submitApp() {
+  // Validate answers
+  const answers = {};
+  let allFilled = true;
+  selectedRPQuestions.forEach((q, i) => {
+    const val = document.getElementById('rpq-' + i)?.value.trim() || '';
+    if (!val) allFilled = false;
+    answers[q] = val;
+  });
+
+  if (!allFilled) {
+    showToast('يرجى الإجابة على جميع الأسئلة', 'error');
+    return;
+  }
+
+  const btn = document.querySelector('#step-2 .btn-primary');
+  btn.textContent = '⏳ جاري الإرسال...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ basicInfo: basicInfoData, randomAnswers: answers })
+    });
+    const data = await res.json();
+    if (data.success) {
+      goToStep(3);
+      showToast('تم إرسال طلبك بنجاح! ✓', 'success');
+    } else {
+      showToast('حدث خطأ: ' + (data.error || 'Unknown error'), 'error');
+      btn.textContent = 'إرسال الطلب ✓';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    showToast('فشل الاتصال بالسيرفر', 'error');
+    btn.textContent = 'إرسال الطلب ✓';
+    btn.disabled = false;
+  }
+}
+
+// ============================================================
+// STORE
+// ============================================================
+function buildStore() {
+  buildGrid('cars-grid', CARS);
+  buildGrid('houses-grid', HOUSES);
+  buildGrid('accessories-grid', ACCESSORIES);
+}
+
+function buildGrid(id, items) {
+  const grid = document.getElementById(id);
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'store-card';
+    card.innerHTML = `
+      <div class="store-card-img">
+        ${item.tag ? `<div class="store-badge">${item.tag}</div>` : ''}
+        <span style="font-size:3.5rem;z-index:1;position:relative;">${item.emoji}</span>
+      </div>
+      <div class="store-card-body">
+        <h3>${item.name}</h3>
+        <p>${item.desc}</p>
+        <ul class="store-features">
+          ${item.features.map(f=>`<li>${f}</li>`).join('')}
+        </ul>
+        <div class="store-price-row">
+          <div class="store-price">${item.price} <span>USD/شهر</span></div>
+          <button class="btn-buy" onclick="showToast('سيتم التواصل معك قريباً على Discord ✓','success')">شراء</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.store-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.store-category').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ============================================================
+// PARTICLES
+// ============================================================
+function buildParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      --dur:${6+Math.random()*10}s;
+      --delay:${Math.random()*8}s;
+      --drift:${(Math.random()-0.5)*100}px;
+    `;
+    container.appendChild(p);
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 3500);
+}
+</script>
+</body>
+</html>
